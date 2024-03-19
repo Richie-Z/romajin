@@ -1,4 +1,4 @@
-import { KuroshiroBuilder } from "../utils/kuromojiBuilder";
+import { KuroshiroBuilder } from "@utils/kuromojiBuilder";
 
 export class KuroshiroService {
   private kuroshiro: Kuroshiro | null = null;
