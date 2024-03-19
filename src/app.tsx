@@ -1,38 +1,52 @@
-import { waitForSpicetify } from "./utils/spicetify";
-import { kuroshiroService } from "./services/kuroshiro.service";
-import isJapanese from "./utils/isJapanese";
 import './styles/lyric-text.scss'
+import { kuroshiroService } from "@services/kuroshiro.service";
+import { waitForSpicetify, isJapanese, getElement, createElement } from "@utils/index";
 
 async function main(): Promise<void> {
   await waitForSpicetify()
   await kuroshiroService.init()
-  const lyricButton = document.querySelector("button.main-nowPlayingBar-lyricsButton")
+  const lyricButton = getElement({ selector: "button.main-nowPlayingBar-lyricsButton" }) as HTMLButtonElement
+  let isAlreadyTranslated = false;
 
-  const convertLyric = async () => {
-    let originalLyric = ""; document.querySelectorAll('.lyrics-lyricsContent-lyric').forEach((val) => originalLyric += `${val.textContent}\n`);
+  const convertLyric: () => Promise<[string, string | null]> = async () => {
+    let originalLyric = "";
+    (getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true }) as NodeListOf<HTMLElement>).
+      forEach((val) => originalLyric += `${val.textContent}\n`)
+    let romajiLyric: string | null = null;
     if (isJapanese(originalLyric)) {
-      let romajiLyric = await kuroshiroService.convert(originalLyric);
-      document.querySelectorAll('.lyrics-lyricsContent-lyric').forEach((val, i) => {
-        const parsedLyric = romajiLyric.split('\n')[i]
-        if (parsedLyric === " ♪ " || val.children.length > 1) return;
-        const newEl = document.createElement('div')
-        newEl.setAttribute('class', 'lyrics-lyricsContent-text sub')
-        newEl.textContent = parsedLyric
-        val.appendChild(newEl)
-      });
+      romajiLyric = await kuroshiroService.convert(originalLyric);
     }
+    return [originalLyric, romajiLyric]
+  }
+
+  const renderLyric = (originalLyric: string, romajiLyric: string) => {
+    const lyricsBox = getElement({ selector: '.lyrics-lyricsContent-lyric', isAll: true }) as NodeListOf<Element>;
+    lyricsBox.forEach((val, i) => {
+      const oriLyric = originalLyric.split('\n')[i]
+      const oriLyricBox = createElement({ className: 'lyrics-lyricsContent-text' }); oriLyricBox.textContent = oriLyric
+      const subLyric = romajiLyric.split('\n')[i]
+      if (subLyric === " ♪ ") return;
+      const subLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub' }); subLyricBox.textContent = subLyric
+      val.replaceChildren(oriLyricBox, subLyricBox)
+    });
   }
 
   if (lyricButton) {
     lyricButton.addEventListener('click', async () => {
-      await convertLyric()
+      if (!isAlreadyTranslated) {
+        const [originalLyric, romajiLyric] = await convertLyric()
+        if (!romajiLyric) return
+        renderLyric(originalLyric, romajiLyric)
+        isAlreadyTranslated = true;
+      }
     })
   }
 
-  Spicetify.Player.addEventListener('songchange', async () => {
-    console.log("should reconvert")
-    await convertLyric()
+  Spicetify.Player.addEventListener("songchange", () => {
+    isAlreadyTranslated = false;
+    lyricButton.click()
   })
+
 }
 
 export default main;
