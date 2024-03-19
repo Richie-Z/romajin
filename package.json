@@ -15,6 +15,6 @@
     "spicetify-creator": "^1.0.17"
   },
   "dependencies": {
-    "google-translate-api-browser": "^4.3.2"
+    "@translate-tools/core": "^1.0.0"
   }
 }

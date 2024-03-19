@@ -2,8 +2,19 @@
   overflow: scroll;
 }
 
-.lyrics-lyricsContent-text.sub {
-  font-weight: 100;
-  font-size: 16px;
-  margin-top: -1rem;
+.lyrics-lyricsContent-text {
+  margin: 0rem 1rem;
+
+  &.sub {
+    font-weight: 100;
+    font-size: 16px;
+    margin-top: -1rem;
+
+    &.english {
+      margin-top: 0rem;
+      margin-bottom: -1rem;
+      ;
+    }
+  }
+
 }

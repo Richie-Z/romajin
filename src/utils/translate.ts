@@ -1,10 +1,9 @@
-import { translate } from "google-translate-api-browser";
+import { GoogleTranslator } from '@translate-tools/core/translators/GoogleTranslator';
 
 export const translateJapaneseToEnglish = async (text: string) => {
-  const res = await translate(text, {
-    to: "en",
-    // corsUrl: "https://cors-anywhere.herokuapp.com/"
-    corsUrl: "https://1dce-103-119-142-221.ngrok-free.app/"
-  })
-  return res.text
+  const translator = new GoogleTranslator({
+    corsProxy: "http://localhost:8080/",
+  });
+  const res = await translator.translate(text, "ja", "en");
+  return res;
 }

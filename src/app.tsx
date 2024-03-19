@@ -1,6 +1,6 @@
 import './styles/lyric-text.scss'
 import { kuroshiroService } from "@services/kuroshiro.service";
-import { waitForSpicetify, isJapanese, getElement, createElement } from "@utils/index";
+import { waitForSpicetify, isJapanese, getElement, createElement, translateJapaneseToEnglish } from "@utils/index";
 
 async function main(): Promise<void> {
   await waitForSpicetify()
@@ -24,7 +24,13 @@ async function main(): Promise<void> {
     lyricsBox.forEach((val, i) => {
       const oriLyric = originalLyric.split('\n')[i]
       const oriLyricBox = createElement({ className: 'lyrics-lyricsContent-text' }); oriLyricBox.textContent = oriLyric
-      const subLyric = romajiLyric.split('\n')[i]
+      const subLyric = romajiLyric.split('\n')[i];
+      (async () => {
+        if (!isJapanese(oriLyric)) return
+        const translated = await translateJapaneseToEnglish(oriLyric)
+        let englishLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub english' }); englishLyricBox.textContent = translated
+        val.insertBefore(englishLyricBox, oriLyricBox)
+      })()
       if (subLyric === " ♪ ") return;
       const subLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub' }); subLyricBox.textContent = subLyric
       val.replaceChildren(oriLyricBox, subLyricBox)
@@ -34,6 +40,7 @@ async function main(): Promise<void> {
   if (lyricButton) {
     lyricButton.addEventListener('click', async () => {
       if (!isAlreadyTranslated) {
+        console.log('should re-render the box')
         const [originalLyric, romajiLyric] = await convertLyric()
         if (!romajiLyric) return
         renderLyric(originalLyric, romajiLyric)
@@ -44,7 +51,6 @@ async function main(): Promise<void> {
 
   Spicetify.Player.addEventListener("songchange", () => {
     isAlreadyTranslated = false;
-    lyricButton.click()
   })
 
 }
