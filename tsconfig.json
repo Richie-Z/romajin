@@ -23,7 +23,14 @@
       "@services/*": [
         "src/services/*"
       ],
-    }
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "types": [
+      "google-translate-api-browser"
+    ]
   },
   "include": [
     "./src/**/*.*"
