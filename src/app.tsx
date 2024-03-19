@@ -1,11 +1,10 @@
 import './styles/lyric-text.scss'
 import { kuroshiroService } from "@services/kuroshiro.service";
-import { waitForSpicetify, isJapanese, getElement, createElement, translateJapaneseToEnglish } from "@utils/index";
+import { waitForSpicetify, isJapanese, getElement, createElement, translateJapaneseToEnglish, checkDomExists } from "@utils/index";
 
 async function main(): Promise<void> {
   await waitForSpicetify()
   await kuroshiroService.init()
-  const lyricButton = getElement({ selector: "button.main-nowPlayingBar-lyricsButton" }) as HTMLButtonElement
   let isAlreadyTranslated = false;
 
   const convertLyric: () => Promise<[string, string | null]> = async () => {
@@ -16,6 +15,7 @@ async function main(): Promise<void> {
     if (isJapanese(originalLyric)) {
       romajiLyric = await kuroshiroService.convert(originalLyric);
     }
+    isAlreadyTranslated = true;
     return [originalLyric, romajiLyric]
   }
 
@@ -37,22 +37,21 @@ async function main(): Promise<void> {
     });
   }
 
-  if (lyricButton) {
-    lyricButton.addEventListener('click', async () => {
+  setInterval(async () => {
+    if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
       if (!isAlreadyTranslated) {
-        console.log('should re-render the box')
         const [originalLyric, romajiLyric] = await convertLyric()
         if (!romajiLyric) return
         renderLyric(originalLyric, romajiLyric)
-        isAlreadyTranslated = true;
       }
-    })
-  }
+    } else {
+      isAlreadyTranslated = false;
+    }
+  }, 1000)
 
-  Spicetify.Player.addEventListener("songchange", () => {
-    isAlreadyTranslated = false;
+  Spicetify.Player.addEventListener('songchange', () => {
+    isAlreadyTranslated = false
   })
-
 }
 
 export default main;

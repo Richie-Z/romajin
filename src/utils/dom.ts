@@ -18,4 +18,9 @@ export function createElement({ className, otherAttributes }: { className: strin
     });
   }
   return el;
+}
+
+export function checkDomExists({ selector }: { selector: string }) {
+  const element = document.querySelector(selector);
+  return element !== null
 } 
