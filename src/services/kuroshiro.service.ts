@@ -1,4 +1,5 @@
 import { KuroshiroBuilder } from "@utils/kuromojiBuilder";
+import { settingService } from "./setting.service";
 
 export class KuroshiroService {
   private kuroshiro: Kuroshiro | null = null;
@@ -23,8 +24,8 @@ export class KuroshiroService {
     }
 
     return await this.kuroshiro.convert(value, {
-      to: "romaji",
-      mode: "spaced"
+      to: settingService.getKuroshiroSetting().to,
+      mode: settingService.getKuroshiroSetting().mode
     });
   }
 }
