@@ -1,0 +1,71 @@
+.romajin-settings {
+  .setting-box {
+    margin: 1rem 0rem;
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .card {
+      background-color: var(--spice-highlight-elevated);
+      border-radius: 10px;
+      padding: 1rem 2rem;
+      margin: 1rem;
+      -webkit-transition: .4s;
+      transition: .4s;
+
+      &.active {
+        background-color: var(--spice-main);
+        margin-bottom: 0rem !important;
+        border-radius: 10px 10px 0px 0px;
+
+        &:hover {
+          background-color: var(--spice-button-disabled);
+        }
+      }
+
+      &.child {
+        margin: 0rem 1rem 0rem 1rem !important;
+        border-radius: 0;
+
+        &:last-child {
+          border-radius: 0 0 10px 10px;
+        }
+      }
+
+      .input {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          text-align: left;
+        }
+      }
+
+      .input-field {
+        padding-inline: 10px;
+        text-align: center;
+        background-color: var(--spice-sidebar);
+        border: none;
+        height: 32px;
+        width: 200px;
+        color: var(--spice-subtext);
+
+        &:is(select) {
+          width: 120px;
+        }
+      }
+
+      .description {
+        margin-top: 5px;
+        color: var(--spice-subtext);
+        font-size: .8rem;
+      }
+    }
+  }
+}
