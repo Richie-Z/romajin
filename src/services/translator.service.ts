@@ -1,6 +1,7 @@
 import { checkDomExists, createElement, getElement, isJapanese } from "@/utils";
 import { kuroshiroService } from "./kuroshiro.service";
 import { googleTranslatorService } from "./googleTranslator.service";
+import { settingService } from "./setting.service";
 
 export class TranslatorService {
   private originalLyric: string = "";
@@ -29,12 +30,14 @@ export class TranslatorService {
       const oriLyric = this.originalLyric.split('\n')[i]
       const oriLyricBox = createElement({ className: 'lyrics-lyricsContent-text' }); oriLyricBox.textContent = oriLyric;
 
-      (async () => {
-        if (oriLyric === " ♪ " || oriLyric.length === 0 || !isJapanese(oriLyric)) return
-        const translated = await googleTranslatorService.translate(oriLyric)
-        let englishLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub english' }); englishLyricBox.textContent = translated
-        val.insertBefore(englishLyricBox, oriLyricBox)
-      })()
+      if (settingService.getGoogleTranslateSetting().active) {
+        (async () => {
+          if (oriLyric === " ♪ " || oriLyric.length === 0 || !isJapanese(oriLyric)) return
+          const translated = await googleTranslatorService.translate(oriLyric)
+          let englishLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub english' }); englishLyricBox.textContent = translated
+          val.insertBefore(englishLyricBox, oriLyricBox)
+        })()
+      }
 
       const subLyric = this.romajiLyric!.split('\n')[i]
       if (subLyric === " ♪ ") return;
