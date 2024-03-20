@@ -1,16 +1,22 @@
 import '../styles/romajin-settings.scss'
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SwitchButton from './SwitchButton'
 import { supportedLanguages } from '@translate-tools/core/translators/GoogleTranslator'
 import { TranslateSettingModel } from '@/models/TranslateSettingModel'
 import { settingService } from '@/services/setting.service'
+import { KuroshiroMode, KuroshiroSettingModel, KuroshiroTo } from '@/models/KuroshiroSettingModel'
 
 export default function SettingModal() {
   const [translate, setTranslate] = useState<TranslateSettingModel>(settingService.getGoogleTranslateSetting())
+  const [kuroshiro, setKuroshiro] = useState<KuroshiroSettingModel>(settingService.getKuroshiroSetting())
 
   useEffect(() => {
     settingService.setGoogleTranslateSetting(translate)
   }, [translate])
+
+  useEffect(() => {
+    settingService.setKuroshiroSetting(kuroshiro)
+  }, [kuroshiro])
 
   return (
     <div className='romajin-settings'>
@@ -46,17 +52,53 @@ export default function SettingModal() {
             </div>
             <div className="card child">
               <div className='input'>
-                <div className="title">Cors Proxy</div>
+                <div className="title">CORS Proxy</div>
                 <input type="text"
                   className='input-field'
                   onChange={(e) => setTranslate((data) => ({ ...data, corsProxy: e.target.value }))}
                   defaultValue={translate.corsProxy ?? ''}
                 />
               </div>
+              <p className="description">Must be filled, Google Translate API blocked by CORS if not have proxy</p>
             </div>
           </div>
         )}
+        <p className='title'>Romaji Setting</p>
+        <div className="card">
+          <div className='input'>
+            <div className="title">Convert To</div>
+            <select
+              className="input-field"
+              onChange={(e) => setKuroshiro((data) => ({ ...data, to: e.target.value as `${KuroshiroTo}` }))}
+            >
+              {Object.values(KuroshiroTo).map((to) =>
+                <option
+                  value={to}
+                  key={to}
+                  selected={to === kuroshiro.to}>{to}</option>
+              )}
+            </select>
+          </div>
+          <p className="description">Target syllabary [hiragana, katakana, romaji]</p>
+        </div>
+        <div className="card">
+          <div className='input'>
+            <div className="title">Convert Mode</div>
+            <select
+              className="input-field"
+              onChange={(e) => setKuroshiro((data) => ({ ...data, mode: e.target.value as `${KuroshiroMode}` }))}
+            >
+              {Object.values(KuroshiroMode).map((mode) =>
+                <option
+                  value={mode}
+                  key={mode}
+                  selected={mode === kuroshiro.mode}>{mode}</option>
+              )}
+            </select>
+          </div>
+          <p className="description">Convert mode [normal, spaced, okurigana, furigana]</p>
+        </div>
       </div>
-    </div >
+    </div>
   )
 }
