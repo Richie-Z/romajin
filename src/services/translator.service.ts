@@ -1,4 +1,4 @@
-import { createElement, getElement, isJapanese, translateJapaneseToEnglish } from "@/utils";
+import { checkDomExists, createElement, getElement, isJapanese, translateJapaneseToEnglish } from "@/utils";
 import { kuroshiroService } from "./kuroshiro.service";
 
 export class TranslatorService {
@@ -40,6 +40,27 @@ export class TranslatorService {
       const subLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub' }); subLyricBox.textContent = subLyric
       val.replaceChildren(oriLyricBox, subLyricBox)
     });
+  }
+
+  public async init() {
+    await kuroshiroService.init()
+    let isAlreadyTranslated = false;
+
+    setInterval(() => {
+      if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
+        if (isAlreadyTranslated) return
+        translatorService.convertLyric().then(() => {
+          translatorService.renderLyric()
+          isAlreadyTranslated = true;
+        })
+      } else {
+        isAlreadyTranslated = false;
+      }
+    }, 500)
+
+    Spicetify.Player.addEventListener('songchange', () => {
+      isAlreadyTranslated = false
+    })
   }
 }
 
