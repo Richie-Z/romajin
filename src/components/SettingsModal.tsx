@@ -2,11 +2,11 @@ import '../styles/romajin-settings.scss'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import SwitchButton from './SwitchButton'
 import { supportedLanguages } from '@translate-tools/core/translators/GoogleTranslator'
-import { TranslateModel } from '@/models/translateModel'
+import { TranslateSettingModel } from '@/models/TranslateSettingModel'
 import { settingService } from '@/services/setting.service'
 
 export default function SettingModal() {
-  const [translate, setTranslate] = useState<TranslateModel>(settingService.getGoogleTranslateSetting())
+  const [translate, setTranslate] = useState<TranslateSettingModel>(settingService.getGoogleTranslateSetting())
 
   useEffect(() => {
     settingService.setGoogleTranslateSetting(translate)
