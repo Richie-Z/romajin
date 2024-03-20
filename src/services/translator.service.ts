@@ -1,5 +1,6 @@
-import { checkDomExists, createElement, getElement, isJapanese, translateJapaneseToEnglish } from "@/utils";
+import { checkDomExists, createElement, getElement, isJapanese } from "@/utils";
 import { kuroshiroService } from "./kuroshiro.service";
+import { googleTranslatorService } from "./googleTranslator.service";
 
 export class TranslatorService {
   private originalLyric: string = "";
@@ -30,7 +31,7 @@ export class TranslatorService {
 
       (async () => {
         if (oriLyric === " ♪ " || oriLyric.length === 0 || !isJapanese(oriLyric)) return
-        const translated = await translateJapaneseToEnglish(oriLyric)
+        const translated = await googleTranslatorService.translate(oriLyric)
         let englishLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub english' }); englishLyricBox.textContent = translated
         val.insertBefore(englishLyricBox, oriLyricBox)
       })()
