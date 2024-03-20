@@ -23,6 +23,9 @@
       "@services/*": [
         "src/services/*"
       ],
+      "@components/*": [
+        "src/components/*"
+      ],
     },
     "typeRoots": [
       "./node_modules/@types",
