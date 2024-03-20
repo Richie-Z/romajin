@@ -6,15 +6,7 @@ import { TranslateModel } from '@/models/translateModel'
 import { settingService } from '@/services/setting.service'
 
 export default function SettingModal() {
-  const [translate, setTranslate] = useState<TranslateModel>({
-    active: true,
-    targetLanguage: 'en',
-    corsProxy: ''
-  })
-
-  useEffect(() => {
-    setTranslate(settingService.getGoogleTranslateSetting())
-  }, [])
+  const [translate, setTranslate] = useState<TranslateModel>(settingService.getGoogleTranslateSetting())
 
   useEffect(() => {
     settingService.setGoogleTranslateSetting(translate)
@@ -34,7 +26,7 @@ export default function SettingModal() {
           </div>
           <p className="description">Enable the google translator</p>
         </div>
-        {translate && (
+        {translate.active && (
           <div className="translate-child">
             <div className="card child">
               <div className='input'>
