@@ -7,6 +7,10 @@ export class TranslatorService {
   private originalLyric: string = "";
   private romajiLyric: string | null = null;
 
+  /**
+    * Converts the original lyrics to romaji and stores them.
+    * @returns {Promise<[string, string | null]>} A promise that resolves to a tuple containing the original lyrics and the romaji version.
+    */
   public async convertLyric(): Promise<[string, string | null]> {
     let originalLyric = "";
     (getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true }) as NodeListOf<HTMLElement>).
@@ -22,6 +26,9 @@ export class TranslatorService {
     return [originalLyric, romajiLyric]
   }
 
+  /**
+     * Renders the lyrics with their translations.
+     */
   public renderLyric(): void {
     if (this.romajiLyric === null) return
     const lyricsBox = getElement({ selector: '.lyrics-lyricsContent-lyric', isAll: true }) as NodeListOf<Element>;
@@ -46,6 +53,9 @@ export class TranslatorService {
     });
   }
 
+  /**
+    * Initializes the translator service.
+    */
   public async init() {
     await kuroshiroService.init()
     let isAlreadyTranslated = false;
