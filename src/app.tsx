@@ -12,7 +12,7 @@ async function main(): Promise<void> {
   new Spicetify.Menu.Item(
     'Romajin Settings',
     false,
-    (self) => {
+    () => {
       Spicetify.PopupModal.display({
         title: 'Romajin Settings',
         content: React.createElement(SettingsModal) as any,
