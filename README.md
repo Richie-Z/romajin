@@ -6,7 +6,7 @@ Romajin is an extension that serves as your guru within Spotify, offering both a
 - [x] Japanese Lyrics Converter
 - [x] Japanese Translator
 - [x] Extension Settings
-- [] Japanese Context Converter
+- [ ] Japanese Context Converter
 
 
 ## Screenshoots

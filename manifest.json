@@ -1,0 +1,7 @@
+{
+  "name": "Romajin",
+  "description": "Romajin is an extension that serves as your guru within Spotify, offering both a Romaji converter and translator functionalities.",
+  "preview": "docs/screenshoots/1.png",
+  "main": "romajin.js",
+  "readme": "README.md"
+}
