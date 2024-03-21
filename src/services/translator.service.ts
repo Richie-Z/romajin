@@ -11,16 +11,18 @@ export class TranslatorService {
     * Converts the original lyrics to romaji and stores them.
     * @returns {Promise<[string, string | null]>} A promise that resolves to a tuple containing the original lyrics and the romaji version.
     */
-  public async convertLyric(): Promise<[string, string | null]> {
+  public async convertLyric(lyric?: string): Promise<[string, string | null]> {
     let originalLyric = "";
-    (getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true }) as NodeListOf<HTMLElement>).
-      forEach((val) => originalLyric += `${val.textContent}\n`)
+    if (!lyric) {
+      (getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true }) as NodeListOf<HTMLElement>).
+        forEach((val) => originalLyric += `${val.textContent}\n`)
+    }
     let romajiLyric: string | null = null;
-    if (isJapanese(originalLyric)) {
-      romajiLyric = await kuroshiroService.convert(originalLyric);
+    if (isJapanese(lyric ?? originalLyric)) {
+      romajiLyric = await kuroshiroService.convert(lyric ?? originalLyric);
     }
 
-    this.originalLyric = originalLyric
+    this.originalLyric = lyric ?? originalLyric
     this.romajiLyric = romajiLyric
 
     return [originalLyric, romajiLyric]
@@ -48,7 +50,7 @@ export class TranslatorService {
 
       const subLyric = this.romajiLyric!.split('\n')[i]
       if (subLyric === " ♪ ") return;
-      const subLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub' }); subLyricBox.textContent = subLyric
+      const subLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub' }); subLyricBox.innerHTML = subLyric
       val.replaceChildren(oriLyricBox, subLyricBox)
     });
   }
@@ -59,14 +61,28 @@ export class TranslatorService {
   public async init() {
     await kuroshiroService.init()
     let isAlreadyTranslated = false;
+    let translateSetting = settingService.getGoogleTranslateSetting();
+    let kuroshiroSetting = settingService.getKuroshiroSetting();
+    let isSettingChanged = false;
 
     setInterval(() => {
+      if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getGoogleTranslateSetting()) ||
+        JSON.stringify(kuroshiroSetting) !== JSON.stringify(settingService.getKuroshiroSetting())
+      ) {
+        isAlreadyTranslated = false
+        isSettingChanged = true
+      }
+
       if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
         if (isAlreadyTranslated) return
-        translatorService.convertLyric().then(() => {
+        translatorService.convertLyric(isSettingChanged ? this.originalLyric : undefined).then(() => {
           translatorService.renderLyric()
           isAlreadyTranslated = true;
         })
+        if (isSettingChanged) {
+          translateSetting = settingService.getGoogleTranslateSetting();
+          kuroshiroSetting = settingService.getKuroshiroSetting();
+        }
       } else {
         isAlreadyTranslated = false;
       }
