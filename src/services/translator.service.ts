@@ -82,6 +82,7 @@ export class TranslatorService {
         if (isSettingChanged) {
           translateSetting = settingService.getGoogleTranslateSetting();
           kuroshiroSetting = settingService.getKuroshiroSetting();
+          isSettingChanged = false;
         }
       } else {
         isAlreadyTranslated = false;
