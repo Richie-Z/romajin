@@ -3,6 +3,7 @@ import './styles/lyric-text.scss'
 import { translatorService } from "@services/translator.service";
 import { waitForSpicetify } from "@/utils";
 import SettingsModal from '@components/SettingsModal';
+import { TRANSLATE_ICON } from './constants/TRANSLATE_ICON';
 
 async function main(): Promise<void> {
   await waitForSpicetify()
@@ -18,6 +19,7 @@ async function main(): Promise<void> {
         isLarge: true
       })
     },
+    TRANSLATE_ICON
   ).register()
 }
 
