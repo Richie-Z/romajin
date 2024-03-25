@@ -10402,7 +10402,7 @@
   var DEFAULT_GOOGLE_TRANSLATE_SETTING = {
     active: true,
     targetLanguage: "en",
-    corsProxy: "http://localhost:8080/"
+    corsProxy: ""
   };
   var DEFAULT_KUROSHIRO_SETTING = {
     to: "romaji",
@@ -10520,13 +10520,12 @@
       let isSettingChanged = false;
       setInterval(() => {
         if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getGoogleTranslateSetting()) || JSON.stringify(kuroshiroSetting) !== JSON.stringify(settingService.getKuroshiroSetting())) {
-          isAlreadyTranslated = false;
           isSettingChanged = true;
         }
         if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
-          if (isAlreadyTranslated)
+          if (isAlreadyTranslated && !isSettingChanged)
             return;
-          translatorService.convertLyric(isSettingChanged ? this.originalLyric : void 0).then(() => {
+          translatorService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : void 0).then(() => {
             translatorService.renderLyric();
             isAlreadyTranslated = true;
           });
@@ -10538,7 +10537,7 @@
         } else {
           isAlreadyTranslated = false;
         }
-      }, 500);
+      }, 1e3);
       Spicetify.Player.addEventListener("songchange", () => {
         isAlreadyTranslated = false;
       });
@@ -10639,7 +10638,9 @@
       defaultValue: (_a = translate.corsProxy) != null ? _a : ""
     })), /* @__PURE__ */ import_react2.default.createElement("p", {
       className: "description"
-    }, "Must be filled, Google Translate API blocked by CORS if not have proxy"))), /* @__PURE__ */ import_react2.default.createElement("p", {
+    }, "Must be filled, Google Translate API blocked by CORS if not have proxy.", /* @__PURE__ */ import_react2.default.createElement("a", {
+      href: "https://github.com/Richie-Z/romajin/issues/1#issuecomment-2017152225"
+    }, " Read this issue ")))), /* @__PURE__ */ import_react2.default.createElement("p", {
       className: "title"
     }, "Romaji Setting"), /* @__PURE__ */ import_react2.default.createElement("div", {
       className: "card"
@@ -10773,10 +10774,7 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
       var el = document.createElement('style');
       el.id = `romajin`;
       el.textContent = (String.raw`
-  /* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-13634-GuXZK0MYDlGc/18e5ee140ec93/lyric-text.css */
-.lyrics-lyrics-contentContainer {
-  overflow: scroll;
-}
+  /* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-36072-gr1ZtsAx6Bdg/18e74e6b2970/lyric-text.css */
 .lyrics-lyricsContent-lyric:first-child {
   margin-top: 2rem;
 }
@@ -10790,7 +10788,7 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
   margin-bottom: -1rem;
 }
 
-/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-13634-GuXZK0MYDlGc/18e5ee140f594/romajin-settings.css */
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-36072-gr1ZtsAx6Bdg/18e74e6b3131/romajin-settings.css */
 .romajin-settings .setting-box {
   margin: 1rem 0rem;
 }
@@ -10852,7 +10850,7 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
   font-size: 0.8rem;
 }
 
-/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-13634-GuXZK0MYDlGc/18e5ee140fa95/switch-button.css */
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-36072-gr1ZtsAx6Bdg/18e74e6b3212/switch-button.css */
 .switch {
   position: relative;
   display: inline-block;
