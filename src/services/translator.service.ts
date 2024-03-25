@@ -75,7 +75,7 @@ export class TranslatorService {
 
       if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
         if (isAlreadyTranslated) return
-        translatorService.convertLyric(isSettingChanged ? this.originalLyric : undefined).then(() => {
+        translatorService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : undefined).then(() => {
           translatorService.renderLyric()
           isAlreadyTranslated = true;
         })
