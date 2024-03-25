@@ -4,7 +4,7 @@ import { TranslateSettingModel } from "@/models/TranslateSettingModel"
 const DEFAULT_GOOGLE_TRANSLATE_SETTING: TranslateSettingModel = {
   active: true,
   targetLanguage: 'en',
-  corsProxy: 'http://localhost:8080/'
+  corsProxy: ''
 }
 
 const DEFAULT_KUROSHIRO_SETTING: KuroshiroSettingModel = {

@@ -59,7 +59,7 @@ export default function SettingModal() {
                   defaultValue={translate.corsProxy ?? ''}
                 />
               </div>
-              <p className="description">Must be filled, Google Translate API blocked by CORS if not have proxy</p>
+              <p className="description">Must be filled, Google Translate API blocked by CORS if not have proxy.<a href='https://github.com/Richie-Z/romajin/issues/1#issuecomment-2017152225'> Read this issue </a></p>
             </div>
           </div>
         )}
