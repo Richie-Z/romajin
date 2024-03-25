@@ -10312,7 +10312,7 @@
   });
 
   // src/app.tsx
-  var import_react3 = __toESM(require_react());
+  var import_react5 = __toESM(require_react());
 
   // src/utils/isJapanese.ts
   function isJapanese(text) {
@@ -10397,6 +10397,26 @@
     const element = document.querySelector(selector);
     return element !== null;
   }
+  function getContextText() {
+    var _a, _b;
+    const elements = getElement({ selector: '[data-context-menu-open="true"]' });
+    if (elements === null) {
+      return null;
+    }
+    let name2 = null;
+    if (elements.matches(".main-trackList-selected")) {
+      const trackTitle = elements.querySelector(
+        ".main-trackList-rowTitle"
+      );
+      name2 = (_a = trackTitle == null ? void 0 : trackTitle.textContent) != null ? _a : null;
+    } else if (elements.matches(".main-entityHeader-title")) {
+      name2 = elements.textContent;
+    } else {
+      const link = elements.matches("a[draggable]") ? elements : elements.querySelector("a[draggable]");
+      name2 = (_b = link == null ? void 0 : link.textContent) != null ? _b : null;
+    }
+    return name2;
+  }
 
   // src/services/setting.service.ts
   var DEFAULT_GOOGLE_TRANSLATE_SETTING = {
@@ -10466,219 +10486,6 @@
   };
   var googleTranslatorService = new GoogleTranslatorService();
 
-  // src/services/translator.service.ts
-  var TranslatorService = class {
-    constructor() {
-      this.originalLyric = "";
-      this.romajiLyric = null;
-    }
-    async convertLyric(lyric) {
-      let originalLyric = "";
-      if (!lyric) {
-        getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true }).forEach((val) => originalLyric += `${val.textContent}
-`);
-      }
-      let romajiLyric = null;
-      if (isJapanese(lyric != null ? lyric : originalLyric)) {
-        romajiLyric = await kuroshiroService.convert(lyric != null ? lyric : originalLyric);
-      }
-      this.originalLyric = lyric != null ? lyric : originalLyric;
-      this.romajiLyric = romajiLyric;
-      return [originalLyric, romajiLyric];
-    }
-    renderLyric() {
-      if (this.romajiLyric === null)
-        return;
-      const lyricsBox = getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true });
-      lyricsBox.forEach((val, i) => {
-        const oriLyric = this.originalLyric.split("\n")[i];
-        const oriLyricBox = createElement({ className: "lyrics-lyricsContent-text" });
-        oriLyricBox.textContent = oriLyric;
-        if (settingService.getGoogleTranslateSetting().active) {
-          (async () => {
-            if (oriLyric === " \u266A " || oriLyric.length === 0 || !isJapanese(oriLyric))
-              return;
-            const translated = await googleTranslatorService.translate(oriLyric);
-            let englishLyricBox = createElement({ className: "lyrics-lyricsContent-text sub english" });
-            englishLyricBox.textContent = translated;
-            val.insertBefore(englishLyricBox, oriLyricBox);
-          })();
-        }
-        const subLyric = this.romajiLyric.split("\n")[i];
-        if (subLyric === " \u266A ")
-          return;
-        const subLyricBox = createElement({ className: "lyrics-lyricsContent-text sub" });
-        subLyricBox.innerHTML = subLyric;
-        val.replaceChildren(oriLyricBox, subLyricBox);
-      });
-    }
-    async init() {
-      await kuroshiroService.init();
-      let isAlreadyTranslated = false;
-      let translateSetting = settingService.getGoogleTranslateSetting();
-      let kuroshiroSetting = settingService.getKuroshiroSetting();
-      let isSettingChanged = false;
-      setInterval(() => {
-        if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getGoogleTranslateSetting()) || JSON.stringify(kuroshiroSetting) !== JSON.stringify(settingService.getKuroshiroSetting())) {
-          isSettingChanged = true;
-        }
-        if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
-          if (isAlreadyTranslated && !isSettingChanged)
-            return;
-          translatorService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : void 0).then(() => {
-            translatorService.renderLyric();
-            isAlreadyTranslated = true;
-          });
-          if (isSettingChanged) {
-            translateSetting = settingService.getGoogleTranslateSetting();
-            kuroshiroSetting = settingService.getKuroshiroSetting();
-            isSettingChanged = false;
-          }
-        } else {
-          isAlreadyTranslated = false;
-        }
-      }, 1e3);
-      Spicetify.Player.addEventListener("songchange", () => {
-        isAlreadyTranslated = false;
-      });
-    }
-  };
-  var translatorService = new TranslatorService();
-
-  // src/components/SettingsModal.tsx
-  var import_react2 = __toESM(require_react());
-
-  // src/components/SwitchButton.tsx
-  var import_react = __toESM(require_react());
-  function SwitchButton(_a) {
-    var _b = _a, { onChange } = _b, props = __objRest(_b, ["onChange"]);
-    return /* @__PURE__ */ import_react.default.createElement("label", {
-      className: "switch"
-    }, /* @__PURE__ */ import_react.default.createElement("input", __spreadValues({
-      type: "checkbox",
-      onChange: (e) => onChange(e.target.checked)
-    }, props)), /* @__PURE__ */ import_react.default.createElement("span", {
-      className: "slider round"
-    }));
-  }
-
-  // src/components/SettingsModal.tsx
-  var import_GoogleTranslator2 = __toESM(require_GoogleTranslator());
-
-  // src/models/KuroshiroSettingModel.ts
-  var KuroshiroTo = /* @__PURE__ */ ((KuroshiroTo2) => {
-    KuroshiroTo2["hiragana"] = "hiragana";
-    KuroshiroTo2["katakana"] = "katakana";
-    KuroshiroTo2["romaji"] = "romaji";
-    return KuroshiroTo2;
-  })(KuroshiroTo || {});
-  var KuroshiroMode = /* @__PURE__ */ ((KuroshiroMode2) => {
-    KuroshiroMode2["normal"] = "normal";
-    KuroshiroMode2["spaced"] = "spaced";
-    KuroshiroMode2["okurigana"] = "okurigana";
-    KuroshiroMode2["furigana"] = "furigana";
-    return KuroshiroMode2;
-  })(KuroshiroMode || {});
-
-  // src/components/SettingsModal.tsx
-  function SettingModal() {
-    var _a;
-    const [translate, setTranslate] = (0, import_react2.useState)(settingService.getGoogleTranslateSetting());
-    const [kuroshiro, setKuroshiro] = (0, import_react2.useState)(settingService.getKuroshiroSetting());
-    (0, import_react2.useEffect)(() => {
-      settingService.setGoogleTranslateSetting(translate);
-    }, [translate]);
-    (0, import_react2.useEffect)(() => {
-      settingService.setKuroshiroSetting(kuroshiro);
-    }, [kuroshiro]);
-    return /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "romajin-settings"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "setting-box"
-    }, /* @__PURE__ */ import_react2.default.createElement("p", {
-      className: "title"
-    }, "Translate"), /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: `card ${translate ? "active" : null}`
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "input"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "title"
-    }, "Enabled"), /* @__PURE__ */ import_react2.default.createElement(SwitchButton, {
-      onChange: (e) => setTranslate((data) => __spreadProps(__spreadValues({}, data), { active: e })),
-      defaultChecked: translate.active
-    })), /* @__PURE__ */ import_react2.default.createElement("p", {
-      className: "description"
-    }, "Enable the google translator")), translate.active && /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "translate-child"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "card child"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "input"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "title"
-    }, "Target Language"), /* @__PURE__ */ import_react2.default.createElement("select", {
-      className: "input-field",
-      onChange: (e) => setTranslate((data) => __spreadProps(__spreadValues({}, data), { targetLanguage: e.target.value }))
-    }, import_GoogleTranslator2.supportedLanguages.map(
-      (lang) => /* @__PURE__ */ import_react2.default.createElement("option", {
-        value: lang,
-        key: lang,
-        selected: lang === translate.targetLanguage
-      }, lang)
-    )))), /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "card child"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "input"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "title"
-    }, "CORS Proxy"), /* @__PURE__ */ import_react2.default.createElement("input", {
-      type: "text",
-      className: "input-field",
-      onChange: (e) => setTranslate((data) => __spreadProps(__spreadValues({}, data), { corsProxy: e.target.value })),
-      defaultValue: (_a = translate.corsProxy) != null ? _a : ""
-    })), /* @__PURE__ */ import_react2.default.createElement("p", {
-      className: "description"
-    }, "Must be filled, Google Translate API blocked by CORS if not have proxy.", /* @__PURE__ */ import_react2.default.createElement("a", {
-      href: "https://github.com/Richie-Z/romajin/issues/1#issuecomment-2017152225"
-    }, " Read this issue ")))), /* @__PURE__ */ import_react2.default.createElement("p", {
-      className: "title"
-    }, "Romaji Setting"), /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "card"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "input"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "title"
-    }, "Convert To"), /* @__PURE__ */ import_react2.default.createElement("select", {
-      className: "input-field",
-      onChange: (e) => setKuroshiro((data) => __spreadProps(__spreadValues({}, data), { to: e.target.value }))
-    }, Object.values(KuroshiroTo).map(
-      (to) => /* @__PURE__ */ import_react2.default.createElement("option", {
-        value: to,
-        key: to,
-        selected: to === kuroshiro.to
-      }, to)
-    ))), /* @__PURE__ */ import_react2.default.createElement("p", {
-      className: "description"
-    }, "Target syllabary [hiragana, katakana, romaji]")), /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "card"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "input"
-    }, /* @__PURE__ */ import_react2.default.createElement("div", {
-      className: "title"
-    }, "Convert Mode"), /* @__PURE__ */ import_react2.default.createElement("select", {
-      className: "input-field",
-      onChange: (e) => setKuroshiro((data) => __spreadProps(__spreadValues({}, data), { mode: e.target.value }))
-    }, Object.values(KuroshiroMode).map(
-      (mode) => /* @__PURE__ */ import_react2.default.createElement("option", {
-        value: mode,
-        key: mode,
-        selected: mode === kuroshiro.mode
-      }, mode)
-    ))), /* @__PURE__ */ import_react2.default.createElement("p", {
-      className: "description"
-    }, "Convert mode [normal, spaced, okurigana, furigana]"))));
-  }
-
   // src/constants/TRANSLATE_ICON.ts
   var TRANSLATE_ICON = `<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="16" height="16" viewBox="0 0 512.000000 512.000000"
@@ -10745,17 +10552,265 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
 </g>
 </svg>`;
 
+  // src/components/ContextNotification.tsx
+  var import_react = __toESM(require_react());
+  function ContextNotification({ ori, romaji, translated }) {
+    return /* @__PURE__ */ import_react.default.createElement(import_react.default.Fragment, null, /* @__PURE__ */ import_react.default.createElement("p", {
+      className: "sub"
+    }, translated), /* @__PURE__ */ import_react.default.createElement("p", null, ori), /* @__PURE__ */ import_react.default.createElement("p", {
+      className: "sub"
+    }, romaji));
+  }
+
+  // src/services/romajin.service.ts
+  var import_react2 = __toESM(require_react());
+  var RomajinService = class {
+    constructor() {
+      this.originalLyric = "";
+      this.romajiLyric = null;
+      this.contextMenu = null;
+    }
+    async convertLyric(lyric) {
+      let originalLyric = "";
+      if (!lyric) {
+        getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true }).forEach((val) => originalLyric += `${val.textContent}
+`);
+      }
+      let romajiLyric = null;
+      if (isJapanese(lyric != null ? lyric : originalLyric)) {
+        romajiLyric = await kuroshiroService.convert(lyric != null ? lyric : originalLyric);
+      }
+      this.originalLyric = lyric != null ? lyric : originalLyric;
+      this.romajiLyric = romajiLyric;
+      return [originalLyric, romajiLyric];
+    }
+    renderLyric() {
+      if (this.romajiLyric === null)
+        return;
+      const lyricsBox = getElement({ selector: ".lyrics-lyricsContent-lyric", isAll: true });
+      lyricsBox.forEach((val, i) => {
+        const oriLyric = this.originalLyric.split("\n")[i];
+        const oriLyricBox = createElement({ className: "lyrics-lyricsContent-text" });
+        oriLyricBox.textContent = oriLyric;
+        if (settingService.getGoogleTranslateSetting().active) {
+          (async () => {
+            if (oriLyric === " \u266A " || oriLyric.length === 0 || !isJapanese(oriLyric))
+              return;
+            const translated = await googleTranslatorService.translate(oriLyric);
+            let englishLyricBox = createElement({ className: "lyrics-lyricsContent-text sub english" });
+            englishLyricBox.textContent = translated;
+            val.insertBefore(englishLyricBox, oriLyricBox);
+          })();
+        }
+        const subLyric = this.romajiLyric.split("\n")[i];
+        if (subLyric === " \u266A ")
+          return;
+        const subLyricBox = createElement({ className: "lyrics-lyricsContent-text sub" });
+        subLyricBox.innerHTML = subLyric;
+        val.replaceChildren(oriLyricBox, subLyricBox);
+      });
+    }
+    async init() {
+      await kuroshiroService.init();
+      this.initContextMenu();
+      let isAlreadyTranslated = false;
+      let translateSetting = settingService.getGoogleTranslateSetting();
+      let kuroshiroSetting = settingService.getKuroshiroSetting();
+      let isSettingChanged = false;
+      setInterval(() => {
+        if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getGoogleTranslateSetting()) || JSON.stringify(kuroshiroSetting) !== JSON.stringify(settingService.getKuroshiroSetting())) {
+          isSettingChanged = true;
+        }
+        if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
+          if (isAlreadyTranslated && !isSettingChanged)
+            return;
+          romajinService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : void 0).then(() => {
+            romajinService.renderLyric();
+            isAlreadyTranslated = true;
+          });
+          if (isSettingChanged) {
+            translateSetting = settingService.getGoogleTranslateSetting();
+            kuroshiroSetting = settingService.getKuroshiroSetting();
+            isSettingChanged = false;
+          }
+        } else {
+          isAlreadyTranslated = false;
+        }
+      }, 1e3);
+      Spicetify.Player.addEventListener("songchange", () => {
+        isAlreadyTranslated = false;
+      });
+    }
+    initContextMenu() {
+      if (this.contextMenu)
+        this.contextMenu.deregister();
+      let selectedText = "";
+      this.contextMenu = new Spicetify.ContextMenu.Item(
+        "Help me Guru!",
+        async () => {
+          Spicetify.showNotification(import_react2.default.createElement(ContextNotification, {
+            ori: selectedText,
+            romaji: await kuroshiroService.convert(selectedText),
+            translated: settingService.getGoogleTranslateSetting().active ? await googleTranslatorService.translate(selectedText) : void 0
+          }), false, 3500);
+        },
+        () => {
+          var _a;
+          selectedText = (_a = getContextText()) != null ? _a : "";
+          return isJapanese(selectedText);
+        },
+        TRANSLATE_ICON
+      );
+      this.contextMenu.register();
+    }
+  };
+  var romajinService = new RomajinService();
+
+  // src/components/SettingsModal.tsx
+  var import_react4 = __toESM(require_react());
+
+  // src/components/SwitchButton.tsx
+  var import_react3 = __toESM(require_react());
+  function SwitchButton(_a) {
+    var _b = _a, { onChange } = _b, props = __objRest(_b, ["onChange"]);
+    return /* @__PURE__ */ import_react3.default.createElement("label", {
+      className: "switch"
+    }, /* @__PURE__ */ import_react3.default.createElement("input", __spreadValues({
+      type: "checkbox",
+      onChange: (e) => onChange(e.target.checked)
+    }, props)), /* @__PURE__ */ import_react3.default.createElement("span", {
+      className: "slider round"
+    }));
+  }
+
+  // src/components/SettingsModal.tsx
+  var import_GoogleTranslator2 = __toESM(require_GoogleTranslator());
+
+  // src/models/KuroshiroSettingModel.ts
+  var KuroshiroTo = /* @__PURE__ */ ((KuroshiroTo2) => {
+    KuroshiroTo2["hiragana"] = "hiragana";
+    KuroshiroTo2["katakana"] = "katakana";
+    KuroshiroTo2["romaji"] = "romaji";
+    return KuroshiroTo2;
+  })(KuroshiroTo || {});
+  var KuroshiroMode = /* @__PURE__ */ ((KuroshiroMode2) => {
+    KuroshiroMode2["normal"] = "normal";
+    KuroshiroMode2["spaced"] = "spaced";
+    KuroshiroMode2["okurigana"] = "okurigana";
+    KuroshiroMode2["furigana"] = "furigana";
+    return KuroshiroMode2;
+  })(KuroshiroMode || {});
+
+  // src/components/SettingsModal.tsx
+  function SettingModal() {
+    var _a;
+    const [translate, setTranslate] = (0, import_react4.useState)(settingService.getGoogleTranslateSetting());
+    const [kuroshiro, setKuroshiro] = (0, import_react4.useState)(settingService.getKuroshiroSetting());
+    (0, import_react4.useEffect)(() => {
+      settingService.setGoogleTranslateSetting(translate);
+    }, [translate]);
+    (0, import_react4.useEffect)(() => {
+      settingService.setKuroshiroSetting(kuroshiro);
+    }, [kuroshiro]);
+    return /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "romajin-settings"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "setting-box"
+    }, /* @__PURE__ */ import_react4.default.createElement("p", {
+      className: "title"
+    }, "Translate"), /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: `card ${translate ? "active" : null}`
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "input"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "title"
+    }, "Enabled"), /* @__PURE__ */ import_react4.default.createElement(SwitchButton, {
+      onChange: (e) => setTranslate((data) => __spreadProps(__spreadValues({}, data), { active: e })),
+      defaultChecked: translate.active
+    })), /* @__PURE__ */ import_react4.default.createElement("p", {
+      className: "description"
+    }, "Enable the google translator")), translate.active && /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "translate-child"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "card child"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "input"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "title"
+    }, "Target Language"), /* @__PURE__ */ import_react4.default.createElement("select", {
+      className: "input-field",
+      onChange: (e) => setTranslate((data) => __spreadProps(__spreadValues({}, data), { targetLanguage: e.target.value }))
+    }, import_GoogleTranslator2.supportedLanguages.map(
+      (lang) => /* @__PURE__ */ import_react4.default.createElement("option", {
+        value: lang,
+        key: lang,
+        selected: lang === translate.targetLanguage
+      }, lang)
+    )))), /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "card child"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "input"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "title"
+    }, "CORS Proxy"), /* @__PURE__ */ import_react4.default.createElement("input", {
+      type: "text",
+      className: "input-field",
+      onChange: (e) => setTranslate((data) => __spreadProps(__spreadValues({}, data), { corsProxy: e.target.value })),
+      defaultValue: (_a = translate.corsProxy) != null ? _a : ""
+    })), /* @__PURE__ */ import_react4.default.createElement("p", {
+      className: "description"
+    }, "Must be filled, Google Translate API blocked by CORS if not have proxy.", /* @__PURE__ */ import_react4.default.createElement("a", {
+      href: "https://github.com/Richie-Z/romajin/issues/1#issuecomment-2017152225"
+    }, " Read this issue ")))), /* @__PURE__ */ import_react4.default.createElement("p", {
+      className: "title"
+    }, "Romaji Setting"), /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "card"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "input"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "title"
+    }, "Convert To"), /* @__PURE__ */ import_react4.default.createElement("select", {
+      className: "input-field",
+      onChange: (e) => setKuroshiro((data) => __spreadProps(__spreadValues({}, data), { to: e.target.value }))
+    }, Object.values(KuroshiroTo).map(
+      (to) => /* @__PURE__ */ import_react4.default.createElement("option", {
+        value: to,
+        key: to,
+        selected: to === kuroshiro.to
+      }, to)
+    ))), /* @__PURE__ */ import_react4.default.createElement("p", {
+      className: "description"
+    }, "Target syllabary [hiragana, katakana, romaji]")), /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "card"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "input"
+    }, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "title"
+    }, "Convert Mode"), /* @__PURE__ */ import_react4.default.createElement("select", {
+      className: "input-field",
+      onChange: (e) => setKuroshiro((data) => __spreadProps(__spreadValues({}, data), { mode: e.target.value }))
+    }, Object.values(KuroshiroMode).map(
+      (mode) => /* @__PURE__ */ import_react4.default.createElement("option", {
+        value: mode,
+        key: mode,
+        selected: mode === kuroshiro.mode
+      }, mode)
+    ))), /* @__PURE__ */ import_react4.default.createElement("p", {
+      className: "description"
+    }, "Convert mode [normal, spaced, okurigana, furigana]"))));
+  }
+
   // src/app.tsx
   async function main() {
     await waitForSpicetify();
-    await translatorService.init();
+    await romajinService.init();
     new Spicetify.Menu.Item(
       "Romajin Settings",
       false,
       () => {
         Spicetify.PopupModal.display({
           title: "Romajin Settings",
-          content: import_react3.default.createElement(SettingModal),
+          content: import_react5.default.createElement(SettingModal),
           isLarge: true
         });
       },
@@ -10774,7 +10829,7 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
       var el = document.createElement('style');
       el.id = `romajin`;
       el.textContent = (String.raw`
-  /* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-36072-gr1ZtsAx6Bdg/18e74e6b2970/lyric-text.css */
+  /* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111e700/lyric-text.css */
 .lyrics-lyricsContent-lyric:first-child {
   margin-top: 2rem;
 }
@@ -10788,7 +10843,13 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
   margin-bottom: -1rem;
 }
 
-/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-36072-gr1ZtsAx6Bdg/18e74e6b3131/romajin-settings.css */
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111ef62/context-notification.css */
+.sub {
+  font-size: 12px;
+  font-weight: 100;
+}
+
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111ee91/romajin-settings.css */
 .romajin-settings .setting-box {
   margin: 1rem 0rem;
 }
@@ -10850,7 +10911,7 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
   font-size: 0.8rem;
 }
 
-/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-36072-gr1ZtsAx6Bdg/18e74e6b3212/switch-button.css */
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111ef93/switch-button.css */
 .switch {
   position: relative;
   display: inline-block;
