@@ -69,12 +69,11 @@ export class TranslatorService {
       if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getGoogleTranslateSetting()) ||
         JSON.stringify(kuroshiroSetting) !== JSON.stringify(settingService.getKuroshiroSetting())
       ) {
-        isAlreadyTranslated = false
         isSettingChanged = true
       }
 
       if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
-        if (isAlreadyTranslated) return
+        if (isAlreadyTranslated && !isSettingChanged) return
         translatorService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : undefined).then(() => {
           translatorService.renderLyric()
           isAlreadyTranslated = true;
