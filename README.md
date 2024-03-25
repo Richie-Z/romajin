@@ -6,13 +6,14 @@ Romajin is an extension that serves as your guru within Spotify, offering both a
 - [x] Japanese Lyrics Converter
 - [x] Japanese Translator
 - [x] Extension Settings
-- [ ] Japanese Context Converter
-- [ ] Change translator Provider
+- [x] Japanese Context Converter
+- [ ] Change Translator Provider Settings
 
 
 ## Screenshoots
 ![thumbnail](docs/screenshoots/1.png)
 ![thumbnail](docs/screenshoots/2.png)
+![thumbnail](docs/screenshoots/3.png)
 
 ## Install Via Marketplace
 1. Follow [Spicetify Marketplace](https://github.com/spicetify/spicetify-marketplace) readme and install it.
