@@ -3,7 +3,7 @@ import { kuroshiroService } from "./kuroshiro.service";
 import { googleTranslatorService } from "./googleTranslator.service";
 import { settingService } from "./setting.service";
 
-export class TranslatorService {
+export class RomajinService {
   private originalLyric: string = "";
   private romajiLyric: string | null = null;
 
@@ -56,7 +56,7 @@ export class TranslatorService {
   }
 
   /**
-    * Initializes the translator service.
+    * Initializes the romajin service.
     */
   public async init() {
     await kuroshiroService.init()
@@ -74,8 +74,8 @@ export class TranslatorService {
 
       if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
         if (isAlreadyTranslated && !isSettingChanged) return
-        translatorService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : undefined).then(() => {
-          translatorService.renderLyric()
+        romajinService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : undefined).then(() => {
+          romajinService.renderLyric()
           isAlreadyTranslated = true;
         })
         if (isSettingChanged) {
@@ -94,4 +94,4 @@ export class TranslatorService {
   }
 }
 
-export const translatorService = new TranslatorService()
+export const romajinService = new RomajinService()
