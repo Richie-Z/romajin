@@ -1,11 +1,15 @@
-import { checkDomExists, createElement, getElement, isJapanese } from "@/utils";
+import { checkDomExists, createElement, getContextText, getElement, isJapanese } from "@/utils";
 import { kuroshiroService } from "./kuroshiro.service";
 import { googleTranslatorService } from "./googleTranslator.service";
 import { settingService } from "./setting.service";
+import { TRANSLATE_ICON } from "@/constants/TRANSLATE_ICON";
+import ContextNotification from "@/components/ContextNotification";
+import React from "react";
 
 export class RomajinService {
   private originalLyric: string = "";
   private romajiLyric: string | null = null;
+  private contextMenu: Spicetify.ContextMenu.Item | null = null;
 
   /**
     * Converts the original lyrics to romaji and stores them.
@@ -60,6 +64,7 @@ export class RomajinService {
     */
   public async init() {
     await kuroshiroService.init()
+    this.initContextMenu()
     let isAlreadyTranslated = false;
     let translateSetting = settingService.getGoogleTranslateSetting();
     let kuroshiroSetting = settingService.getKuroshiroSetting();
@@ -91,6 +96,29 @@ export class RomajinService {
     Spicetify.Player.addEventListener('songchange', () => {
       isAlreadyTranslated = false
     })
+  }
+
+  private initContextMenu() {
+    if (this.contextMenu) this.contextMenu.deregister()
+
+    let selectedText = "";
+
+    this.contextMenu = new Spicetify.ContextMenu.Item(
+      "Help me Guru!",
+      async () => {
+        Spicetify.showNotification(React.createElement(ContextNotification, {
+          ori: selectedText,
+          romaji: await kuroshiroService.convert(selectedText),
+          translated: settingService.getGoogleTranslateSetting().active ? await googleTranslatorService.translate(selectedText) : undefined
+        }) as any, false, 3500)
+      },
+      () => {
+        selectedText = getContextText() ?? '';
+        return isJapanese(selectedText);
+      },
+      TRANSLATE_ICON as any
+    )
+    this.contextMenu.register()
   }
 }
 

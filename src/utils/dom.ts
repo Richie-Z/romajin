@@ -23,4 +23,31 @@ export function createElement({ className, otherAttributes }: { className: strin
 export function checkDomExists({ selector }: { selector: string }) {
   const element = document.querySelector(selector);
   return element !== null
-} 
+}
+
+export function getContextText(): string | null {
+  const elements = getElement({ selector: '[data-context-menu-open="true"]' }) as Element;
+  if (elements === null) {
+    return null;
+  }
+
+  let name: string | null = null;
+
+  if (elements.matches('.main-trackList-selected')) {
+    // Track row: get the name from div
+    const trackTitle = elements.querySelector(
+      '.main-trackList-rowTitle',
+    );
+    name = trackTitle?.textContent ?? null;
+  } else if (elements.matches('.main-entityHeader-title')) {
+    // Title of playlist, album, etc. from the details page header
+    name = elements.textContent;
+  } else {
+    // Artist or album name selected from a track row
+    const link = elements.matches('a[draggable]')
+      ? elements
+      : elements.querySelector('a[draggable]');
+    name = link?.textContent ?? null;
+  }
+  return name;
+}
