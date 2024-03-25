@@ -87,7 +87,7 @@ export class TranslatorService {
       } else {
         isAlreadyTranslated = false;
       }
-    }, 500)
+    }, 1000)
 
     Spicetify.Player.addEventListener('songchange', () => {
       isAlreadyTranslated = false
