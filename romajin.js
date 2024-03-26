@@ -10621,22 +10621,20 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
         if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getGoogleTranslateSetting()) || JSON.stringify(kuroshiroSetting) !== JSON.stringify(settingService.getKuroshiroSetting())) {
           isSettingChanged = true;
         }
-        if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
-          if (isAlreadyTranslated && !isSettingChanged)
-            return;
-          romajinService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : void 0).then(() => {
-            romajinService.renderLyric();
-            isAlreadyTranslated = true;
-          });
-          if (isSettingChanged) {
-            translateSetting = settingService.getGoogleTranslateSetting();
-            kuroshiroSetting = settingService.getKuroshiroSetting();
-            isSettingChanged = false;
-          }
-        } else {
-          isAlreadyTranslated = false;
+        if (!checkDomExists({ selector: "div.lyrics-lyrics-container" }))
+          return;
+        isAlreadyTranslated = checkDomExists({ selector: "div.lyrics-lyricsContent-text.sub" });
+        if (isAlreadyTranslated && !isSettingChanged)
+          return;
+        romajinService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : void 0).then(() => {
+          romajinService.renderLyric();
+        });
+        if (isSettingChanged) {
+          translateSetting = settingService.getGoogleTranslateSetting();
+          kuroshiroSetting = settingService.getKuroshiroSetting();
+          isSettingChanged = false;
         }
-      }, 1e3);
+      }, 500);
       Spicetify.Player.addEventListener("songchange", () => {
         isAlreadyTranslated = false;
       });
@@ -10829,7 +10827,7 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
       var el = document.createElement('style');
       el.id = `romajin`;
       el.textContent = (String.raw`
-  /* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111e700/lyric-text.css */
+  /* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-42371-5Ukgenw3XZ9v/18e79f55774bf/lyric-text.css */
 .lyrics-lyricsContent-lyric:first-child {
   margin-top: 2rem;
 }
@@ -10843,13 +10841,13 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
   margin-bottom: -1rem;
 }
 
-/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111ef62/context-notification.css */
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-42371-5Ukgenw3XZ9v/18e79f5577bc1/context-notification.css */
 .sub {
   font-size: 12px;
   font-weight: 100;
 }
 
-/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111ee91/romajin-settings.css */
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-42371-5Ukgenw3XZ9v/18e79f5577bc0/romajin-settings.css */
 .romajin-settings .setting-box {
   margin: 1rem 0rem;
 }
@@ -10911,7 +10909,7 @@ m153 -160 c26 -90 76 -282 76 -291 0 -8 -31 -12 -100 -12 -69 0 -100 4 -100
   font-size: 0.8rem;
 }
 
-/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-77738-xL67RG7tqQw8/18e75111ef93/switch-button.css */
+/* ../../../../../../var/folders/pd/qsy0fv9j0ts43m9j8cbg5r5r0000gn/T/tmp-42371-5Ukgenw3XZ9v/18e79f5577fc2/switch-button.css */
 .switch {
   position: relative;
   display: inline-block;
