@@ -76,22 +76,18 @@ export class RomajinService {
       ) {
         isSettingChanged = true
       }
-
-      if (checkDomExists({ selector: "div.lyrics-lyrics-container" })) {
-        if (isAlreadyTranslated && !isSettingChanged) return
-        romajinService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : undefined).then(() => {
-          romajinService.renderLyric()
-          isAlreadyTranslated = true;
-        })
-        if (isSettingChanged) {
-          translateSetting = settingService.getGoogleTranslateSetting();
-          kuroshiroSetting = settingService.getKuroshiroSetting();
-          isSettingChanged = false;
-        }
-      } else {
-        isAlreadyTranslated = false;
+      if (!checkDomExists({ selector: "div.lyrics-lyrics-container" })) return;
+      isAlreadyTranslated = checkDomExists({ selector: "div.lyrics-lyricsContent-text.sub" });
+      if (isAlreadyTranslated && !isSettingChanged) return
+      romajinService.convertLyric(isSettingChanged && isAlreadyTranslated ? this.originalLyric : undefined).then(() => {
+        romajinService.renderLyric()
+      })
+      if (isSettingChanged) {
+        translateSetting = settingService.getGoogleTranslateSetting();
+        kuroshiroSetting = settingService.getKuroshiroSetting();
+        isSettingChanged = false;
       }
-    }, 1000)
+    }, 500)
 
     Spicetify.Player.addEventListener('songchange', () => {
       isAlreadyTranslated = false
