@@ -1,10 +1,16 @@
 import { KuroshiroSettingModel } from "@/models/KuroshiroSettingModel";
 import { TranslateSettingModel } from "@/models/TranslateSettingModel"
 
-const DEFAULT_GOOGLE_TRANSLATE_SETTING: TranslateSettingModel = {
+export enum TranslatorProvider {
+  GOOGLE = "google",
+  YANDEX = "yandex"
+}
+
+const DEFAULT_TRANSLATOR_SETTING: TranslateSettingModel = {
   active: true,
   targetLanguage: 'en',
-  corsProxy: ''
+  corsProxy: '',
+  provider: TranslatorProvider.GOOGLE
 }
 
 const DEFAULT_KUROSHIRO_SETTING: KuroshiroSettingModel = {
@@ -13,16 +19,16 @@ const DEFAULT_KUROSHIRO_SETTING: KuroshiroSettingModel = {
 }
 
 export class SettingService {
-  private readonly googleTranslateSettingKey: string = "romajin:google_translate"
+  private readonly translatorSettingKey: string = "romajin:translator"
   private readonly kuroshiroSettingKey: string = "romajin:kuroshiro"
 
-  public getGoogleTranslateSetting(): TranslateSettingModel {
-    const localData = localStorage.getItem(this.googleTranslateSettingKey);
-    return localData ? JSON.parse(localData) : DEFAULT_GOOGLE_TRANSLATE_SETTING
+  public getTranslatorSetting(): TranslateSettingModel {
+    const localData = localStorage.getItem(this.translatorSettingKey);
+    return localData ? JSON.parse(localData) : DEFAULT_TRANSLATOR_SETTING
   }
 
-  public setGoogleTranslateSetting(setting: TranslateSettingModel) {
-    localStorage.setItem(this.googleTranslateSettingKey, JSON.stringify(setting))
+  public setTranslatorSetting(setting: TranslateSettingModel) {
+    localStorage.setItem(this.translatorSettingKey, JSON.stringify(setting))
   }
 
   public getKuroshiroSetting(): KuroshiroSettingModel {

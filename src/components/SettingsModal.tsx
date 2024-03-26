@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react'
 import SwitchButton from './SwitchButton'
 import { supportedLanguages } from '@translate-tools/core/translators/GoogleTranslator'
 import { TranslateSettingModel } from '@/models/TranslateSettingModel'
-import { settingService } from '@/services/setting.service'
+import { TranslatorProvider, settingService } from '@/services/setting.service'
 import { KuroshiroMode, KuroshiroSettingModel, KuroshiroTo } from '@/models/KuroshiroSettingModel'
 
 export default function SettingModal() {
-  const [translate, setTranslate] = useState<TranslateSettingModel>(settingService.getGoogleTranslateSetting())
+  const [translate, setTranslate] = useState<TranslateSettingModel>(settingService.getTranslatorSetting())
   const [kuroshiro, setKuroshiro] = useState<KuroshiroSettingModel>(settingService.getKuroshiroSetting())
 
   useEffect(() => {
-    settingService.setGoogleTranslateSetting(translate)
+    settingService.setTranslatorSetting(translate)
   }, [translate])
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function SettingModal() {
               defaultChecked={translate.active}
             />
           </div>
-          <p className="description">Enable the google translator</p>
+          <p className="description">Enable the translator</p>
         </div>
         {translate.active && (
           <div className="translate-child">
@@ -52,6 +52,22 @@ export default function SettingModal() {
             </div>
             <div className="card child">
               <div className='input'>
+                <div className="title">Translator Provider</div>
+                <select
+                  className="input-field"
+                  onChange={(e) => setTranslate((data) => ({ ...data, provider: e.target.value as `${TranslatorProvider}` }))}
+                >
+                  {Object.values(TranslatorProvider).map((provider) =>
+                    <option
+                      value={provider}
+                      key={provider}
+                      selected={provider === translate.provider}>{provider}</option>
+                  )}
+                </select>
+              </div>
+            </div>
+            <div className="card child">
+              <div className='input'>
                 <div className="title">CORS Proxy</div>
                 <input type="text"
                   className='input-field'
@@ -59,7 +75,7 @@ export default function SettingModal() {
                   defaultValue={translate.corsProxy ?? ''}
                 />
               </div>
-              <p className="description">Must be filled, Google Translate API blocked by CORS if not have proxy.<a href='https://github.com/Richie-Z/romajin/issues/1#issuecomment-2017152225'> Read this issue </a></p>
+              <p className="description">Must be filled, Accessing the Translate API is blocked by CORS if not accessing through a proxy.<a href='https://github.com/Richie-Z/romajin/issues/1#issuecomment-2017152225'> Read this issue </a></p>
             </div>
           </div>
         )}

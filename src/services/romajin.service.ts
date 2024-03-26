@@ -1,6 +1,6 @@
 import { checkDomExists, createElement, getContextText, getElement, isJapanese } from "@/utils";
 import { kuroshiroService } from "./kuroshiro.service";
-import { googleTranslatorService } from "./googleTranslator.service";
+import { translatorService } from "./translator.service";
 import { settingService } from "./setting.service";
 import { TRANSLATE_ICON } from "@/constants/TRANSLATE_ICON";
 import ContextNotification from "@/components/ContextNotification";
@@ -43,10 +43,10 @@ export class RomajinService {
       const oriLyric = this.originalLyric.split('\n')[i]
       const oriLyricBox = createElement({ className: 'lyrics-lyricsContent-text' }); oriLyricBox.textContent = oriLyric;
 
-      if (settingService.getGoogleTranslateSetting().active) {
+      if (settingService.getTranslatorSetting().active) {
         (async () => {
           if (oriLyric === " ♪ " || oriLyric.length === 0 || !isJapanese(oriLyric)) return
-          const translated = await googleTranslatorService.translate(oriLyric)
+          const translated = await translatorService.translate(oriLyric)
           let englishLyricBox = createElement({ className: 'lyrics-lyricsContent-text sub english' }); englishLyricBox.textContent = translated
           val.insertBefore(englishLyricBox, oriLyricBox)
         })()
@@ -66,12 +66,12 @@ export class RomajinService {
     await kuroshiroService.init()
     this.initContextMenu()
     let isAlreadyTranslated = false;
-    let translateSetting = settingService.getGoogleTranslateSetting();
+    let translateSetting = settingService.getTranslatorSetting();
     let kuroshiroSetting = settingService.getKuroshiroSetting();
     let isSettingChanged = false;
 
     setInterval(() => {
-      if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getGoogleTranslateSetting()) ||
+      if (JSON.stringify(translateSetting) !== JSON.stringify(settingService.getTranslatorSetting()) ||
         JSON.stringify(kuroshiroSetting) !== JSON.stringify(settingService.getKuroshiroSetting())
       ) {
         isSettingChanged = true
@@ -83,7 +83,7 @@ export class RomajinService {
         romajinService.renderLyric()
       })
       if (isSettingChanged) {
-        translateSetting = settingService.getGoogleTranslateSetting();
+        translateSetting = settingService.getTranslatorSetting();
         kuroshiroSetting = settingService.getKuroshiroSetting();
         isSettingChanged = false;
       }
@@ -105,7 +105,7 @@ export class RomajinService {
         Spicetify.showNotification(React.createElement(ContextNotification, {
           ori: selectedText,
           romaji: await kuroshiroService.convert(selectedText),
-          translated: settingService.getGoogleTranslateSetting().active ? await googleTranslatorService.translate(selectedText) : undefined
+          translated: settingService.getTranslatorSetting().active ? await translatorService.translate(selectedText) : undefined
         }) as any, false, 3500)
       },
       () => {
